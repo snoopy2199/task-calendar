@@ -54,7 +54,7 @@ export default {
     draggable,
   },
   data() {
-    const data = { total: 0, task: { backlog: [] }, temp: '' };
+    const data = { task: { backlog: [] }, temp: '' };
 
     for (let i = 1; i <= 10; i += 1) {
       data.task[`block${i}`] = {
@@ -71,10 +71,9 @@ export default {
       if (!newTask) return;
 
       this.task.backlog.push({
-        id: this.total,
+        id: Date.now(),
         name: newTask,
       });
-      this.total += 1;
       this.temp = '';
     },
   },
