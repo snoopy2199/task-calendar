@@ -25,7 +25,8 @@
             :key="item.id"
             class="tc-board__task"
           >
-            {{item.name}}
+            <span>{{item.name}}</span>
+            <span class="tc-board__remove_button" @click="removeTask(`block${i}`, item)">X</span>
           </div>
         </draggable>
       </div>
@@ -34,14 +35,17 @@
       <div class="tc-board__block-title">Backlog</div>
       <draggable
         class="tc-board__list"
-        v-model="task.backlog"
+        v-model="task.backlog.list"
         :options="{group:'task'}"
         @start="drag=true"
         @end="drag=false"
         @update="saveToLocalStorage()"
         @remove="saveToLocalStorage()"
       >
-        <div v-for="item in task.backlog" :key="item.id" class="tc-board__task">{{item.name}}</div>
+        <div v-for="item in task.backlog.list" :key="item.id" class="tc-board__task">
+          <span>{{item.name}}</span>
+          <span class="tc-board__remove_button" @click="removeTask('backlog', item)">X</span>
+        </div>
       </draggable>
       <div class="tc-board__tool">
         <input
@@ -52,7 +56,6 @@
         >
         <button @click="createTask()" class="tc-board__button">Create</button>
       </div>
-
     </div>
   </div>
 </template>
@@ -74,7 +77,7 @@ export default {
     if (save) {
       task = JSON.parse(save);
     } else {
-      task = { backlog: [] };
+      task = { backlog: { list: [] } };
       for (let i = 1; i <= 10; i += 1) {
         task[`block${i}`] = {
           title: `Day ${i}`,
@@ -90,12 +93,16 @@ export default {
       const newTask = this.temp && this.temp.trim();
       if (!newTask) return;
 
-      this.task.backlog.push({
+      this.task.backlog.list.push({
         id: Date.now(),
         name: newTask,
       });
       this.temp = '';
 
+      this.saveToLocalStorage();
+    },
+    removeTask(block, task) {
+      this.task[block].list.splice(this.task[block].list.indexOf(task), 1);
       this.saveToLocalStorage();
     },
     saveToLocalStorage() {
@@ -176,6 +183,8 @@ export default {
   margin: 5px 0;
   padding: 5px;
   font-size: 14px;
+  display: grid;
+  grid-template-columns: auto 20px;
 }
 
 .tc-board__block-input {
@@ -187,5 +196,15 @@ export default {
 
 .tc-board__block-input_is-show {
   display: block;
+}
+
+.tc-board__remove_button {
+  display: none;
+  cursor: pointer;
+  padding: 0 5px;
+}
+
+.tc-board__task:hover .tc-board__remove_button {
+  display: inline-block;
 }
 </style>
