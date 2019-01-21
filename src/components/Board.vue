@@ -2,7 +2,15 @@
   <div class="tc-board">
     <div class="tc-board__calendar">
       <div v-for="i in 10" class="tc-board__block" :key="i">
-        <div class="tc-board__block-title">{{task[`block${i}`].title}}</div>
+        <div class="tc-board__block-title">
+          <span @click="editing = `block${i}`">{{task[`block${i}`].title}}</span>
+          <input
+            v-model="task[`block${i}`].title"
+            class="tc-board__input tc-board__block-input"
+            :class="{'tc-board__block-input_is-show': editing === `block${i}`}"
+            @keypress.enter="editing = null; saveToLocalStorage();"
+          >
+        </div>
         <draggable
           class="tc-board__list"
           v-model="task[`block${i}`].list"
@@ -40,9 +48,9 @@
           v-model="temp"
           placeholder="Create a task"
           class="tc-board__input"
-          v-on:keypress.enter="createTask()"
+          @keypress.enter="createTask()"
         >
-        <button v-on:click="createTask()" class="tc-board__button">Create</button>
+        <button @click="createTask()" class="tc-board__button">Create</button>
       </div>
 
     </div>
@@ -75,7 +83,7 @@ export default {
       }
     }
 
-    return { task, temp: '' };
+    return { task, temp: '', editing: null };
   },
   methods: {
     createTask() {
@@ -125,6 +133,7 @@ export default {
   font-weight: bold;
   font-size: 16px;
   text-align: center;
+  position: relative;
 }
 
 .tc-board__list {
@@ -145,6 +154,7 @@ export default {
   margin: 5px 0;
   padding: 5px;
   box-sizing: border-box;
+  border: solid 1px #ccc;
 }
 
 .tc-board__button:focus,
@@ -166,5 +176,16 @@ export default {
   margin: 5px 0;
   padding: 5px;
   font-size: 14px;
+}
+
+.tc-board__block-input {
+  position: absolute;
+  left: 0;
+  top: -2px;
+  display: none;
+}
+
+.tc-board__block-input_is-show {
+  display: block;
 }
 </style>
