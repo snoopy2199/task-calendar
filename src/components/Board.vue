@@ -32,7 +32,12 @@
         <div v-for="item in task.backlog" :key="item.id" class="tc-board__task">{{item.name}}</div>
       </draggable>
       <div class="tc-board__tool">
-        <input v-model="temp" placeholder="Create a task" class="tc-board__input">
+        <input
+          v-model="temp"
+          placeholder="Create a task"
+          class="tc-board__input"
+          v-on:keypress.enter="createTask()"
+        >
         <button v-on:click="createTask()" class="tc-board__button">Create</button>
       </div>
 
