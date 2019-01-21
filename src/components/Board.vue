@@ -149,5 +149,6 @@ export default {
   color: #2c3e50;
   margin: 5px 0;
   padding: 5px;
+  font-size: 14px;
 }
 </style>
