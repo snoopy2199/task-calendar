@@ -9,6 +9,8 @@
           :options="{group:'task'}"
           @start="drag=true"
           @end="drag=false"
+          @update="saveToLocalStorage()"
+          @remove="saveToLocalStorage()"
         >
           <div
             v-for="item in task[`block${i}`].list"
@@ -28,6 +30,8 @@
         :options="{group:'task'}"
         @start="drag=true"
         @end="drag=false"
+        @update="saveToLocalStorage()"
+        @remove="saveToLocalStorage()"
       >
         <div v-for="item in task.backlog" :key="item.id" class="tc-board__task">{{item.name}}</div>
       </draggable>
@@ -48,22 +52,30 @@
 <script>
 import draggable from 'vuedraggable';
 
+const STORAGE_KEY = 'tsy-task-calendar';
+
 export default {
   name: 'Board',
   components: {
     draggable,
   },
   data() {
-    const data = { task: { backlog: [] }, temp: '' };
+    const save = localStorage.getItem(STORAGE_KEY);
 
-    for (let i = 1; i <= 10; i += 1) {
-      data.task[`block${i}`] = {
-        title: `Day ${i}`,
-        list: [],
-      };
+    let task;
+    if (save) {
+      task = JSON.parse(save);
+    } else {
+      task = { backlog: [] };
+      for (let i = 1; i <= 10; i += 1) {
+        task[`block${i}`] = {
+          title: `Day ${i}`,
+          list: [],
+        };
+      }
     }
 
-    return data;
+    return { task, temp: '' };
   },
   methods: {
     createTask() {
@@ -75,6 +87,11 @@ export default {
         name: newTask,
       });
       this.temp = '';
+
+      this.saveToLocalStorage();
+    },
+    saveToLocalStorage() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(this.task));
     },
   },
 };
