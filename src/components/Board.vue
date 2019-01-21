@@ -24,9 +24,11 @@
             v-for="item in task[`block${i}`].list"
             :key="item.id"
             class="tc-board__task"
+            :class="{'tc-board__task_is-done': item.isDone}"
           >
-            <span>{{item.name}}</span>
-            <span class="tc-board__remove_button" @click="removeTask(`block${i}`, item)">X</span>
+            <span class="tc-board__task-name">{{item.name}}</span>
+            <span class="tc-board__task-button" @click="doneTask(item)">V</span>
+            <span class="tc-board__task-button" @click="removeTask(`block${i}`, item)">X</span>
           </div>
         </draggable>
       </div>
@@ -42,9 +44,15 @@
         @update="saveToLocalStorage()"
         @remove="saveToLocalStorage()"
       >
-        <div v-for="item in task.backlog.list" :key="item.id" class="tc-board__task">
-          <span>{{item.name}}</span>
-          <span class="tc-board__remove_button" @click="removeTask('backlog', item)">X</span>
+        <div
+          v-for="item in task.backlog.list"
+          :key="item.id"
+          class="tc-board__task"
+          :class="{'tc-board__task_is-done': item.isDone}"
+        >
+          <span class="tc-board__task-name">{{item.name}}</span>
+          <span class="tc-board__task-button" @click="doneTask(item)">V</span>
+          <span class="tc-board__task-button" @click="removeTask('backlog', item)">X</span>
         </div>
       </draggable>
       <div class="tc-board__tool">
@@ -96,6 +104,7 @@ export default {
       this.task.backlog.list.push({
         id: Date.now(),
         name: newTask,
+        isDone: false,
       });
       this.temp = '';
 
@@ -103,6 +112,10 @@ export default {
     },
     removeTask(block, task) {
       this.task[block].list.splice(this.task[block].list.indexOf(task), 1);
+      this.saveToLocalStorage();
+    },
+    doneTask(task) {
+      task.isDone = !task.isDone;
       this.saveToLocalStorage();
     },
     saveToLocalStorage() {
@@ -184,7 +197,16 @@ export default {
   padding: 5px;
   font-size: 14px;
   display: grid;
-  grid-template-columns: auto 20px;
+  grid-template-columns: auto 20px 20px;
+}
+
+.tc-board__task_is-done {
+  opacity: 0.6;
+  box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+
+  .tc-board__task-name {
+    text-decoration: line-through;
+  }
 }
 
 .tc-board__block-input {
@@ -198,13 +220,13 @@ export default {
   display: block;
 }
 
-.tc-board__remove_button {
+.tc-board__task-button {
   display: none;
   cursor: pointer;
   padding: 0 5px;
 }
 
-.tc-board__task:hover .tc-board__remove_button {
+.tc-board__task:hover .tc-board__task-button {
   display: inline-block;
 }
 </style>
